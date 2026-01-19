@@ -149,7 +149,7 @@ pip install requests tqdm nltk
 
 Le modèle doit être placé dans :
 ```
-C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\models\twitter-xlm-roberta
+C:\Users\...
 ```
 
 **Téléchargement depuis Hugging Face** :
@@ -158,7 +158,7 @@ C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\models\twitter-xlm-roberta
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 MODEL_NAME = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
-SAVE_PATH = r"C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\models\twitter-xlm-roberta"
+SAVE_PATH = r"C:\Users\..."
 
 # Télécharger et sauvegarder
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -234,7 +234,8 @@ app.add_middleware(
 
 Les logs sont écrits dans :
 ```
-C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\MCP\mcp_server.log
+C:\Users\...\mcp_server.log
+Il se trouve dans le meme Workspace que le fichier `mcp_sentiment_server.py`
 ```
 
 Pour changer l'emplacement, modifiez `LOG_FILE` dans `mcp_sentiment_server.py`.
@@ -632,7 +633,8 @@ Voici l'analyse des sentiments :
 
 1. Vérifiez le fichier de log :
    ```
-   C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\MCP\mcp_server.log
+   C:\Users\...\mcp_server.log
+   Dans le meme Workspace 
    ```
 
 2. Vérifiez que le chemin Python est correct :
@@ -678,7 +680,7 @@ uvicorn mcp_api_server:app --port 8001
 1. Vérifiez le chemin :
    ```python
    import os
-   MODEL_PATH = r"C:\Users\HP ZBOOK\Desktop\ETUDES\2024-2025\NLP\models\twitter-xlm-roberta"
+   MODEL_PATH = r"C:\Users\...\models\twitter-xlm-roberta"
    print(os.path.exists(MODEL_PATH))  # Doit afficher True
    ```
 
@@ -863,7 +865,7 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 👥 Auteurs
 
-- **Votre Nom** - Développement initial
+- **YANOGO Azania Ragnag-Ne-Wende**
 
 ---
 
@@ -879,9 +881,9 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 Pour toute question ou problème :
 
-- 📧 Email : votre.email@example.com
-- 🐛 Issues : [GitHub Issues](https://github.com/votre-repo/issues)
-- 📖 Documentation : [Wiki](https://github.com/votre-repo/wiki)
+- 📧 Email : yanogoazania2003@gmail.com
+- 🐛 Issues : [GitHub Issues](https://github.com/Dingboy03/sentiment_analysis/issues)
+- 📖 Documentation : [Wiki](https://github.com/Dingboy03/sentiment_analysis/wiki)
 
 ---
 
