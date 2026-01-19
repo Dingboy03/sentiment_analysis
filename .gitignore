@@ -1,0 +1,29 @@
+# Fichiers Python compilés
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Environnements virtuels
+env/
+venv/
+*.conda
+*.virtualenv
+
+# Données lourdes ou sensibles
+*.json
+
+# Environnements IDE
+.vscode/
+*.ipynb_checkpoints
+
+# Fichiers secrets
+.env
+
+# Fichiers temporaires
+*.tmp
+*.swp
+.DS_Store
