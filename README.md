@@ -38,43 +38,15 @@ Ce projet implémente un **système complet d'analyse de sentiment** pour textes
 ✅ Logging détaillé pour debugging  
 ✅ API REST avec documentation Swagger automatique  
 ✅ Intégration MCP pour Claude Desktop  
-✅ Analyse batch via notebooks Jupyter  
+✅ Analyse batch via notebooks Jupyter
 
 ---
 
 ## 🏗️ Architecture du système
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    INTERFACES UTILISATEUR                    │
-├──────────────────┬──────────────────┬──────────────────────┤
-│  Claude Desktop  │   API FastAPI    │  Jupyter Notebooks   │
-│   (MCP Client)   │  (HTTP REST)     │   (Batch Analysis)   │
-└────────┬─────────┴────────┬─────────┴──────────┬───────────┘
-         │                  │                    │
-         │                  │                    │
-         ▼                  ▼                    ▼
-┌─────────────────────────────────────────────────────────────┐
-│              COUCHE TRAITEMENT (Core Engine)                 │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │         mcp_sentiment_server.py                      │   │
-│  │  • clean_text() : Nettoyage & normalisation          │   │
-│  │  • analyze_sentiment() : Analyse NLP                 │   │
-│  │  • handle_mcp_request() : Routage MCP                │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  MODÈLE NLP (Deep Learning)                  │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  twitter-xlm-roberta-base (XLM-RoBERTa)             │   │
-│  │  • Tokenizer : AutoTokenizer                         │   │
-│  │  • Model : AutoModelForSequenceClassification        │   │
-│  │  • Classes : [negative, neutral, positive]           │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-```
+
+[![](https://mermaid.ink/img/pako:eNqdVO1O2zAUfRXLSBNITckH_UgElfoBGlMLVemkaRQhJ7lpLdw4cxxoQUh7lj3anmQ3SWnXojFEfiS-9j3H9xxf54kGMgTq0UjIh2DGlCbj3iQm-KSZP1UsmZGv59cTSib0ppzPn5ArCDSXMemPNrNtCxO7gmUhkB6kd1omx746bO0PukPSFRxifbBF07YR0B6ekzOWavyW2Z_H4yEZnV6Nd5IdTP6SJUsNilxIDb6Ud2kJ6TAdzEg7ZmKZ8nSDgzgsBzuSupej01eiOnn5x35rHiS3KdbK5_jCkboHVU2Wx4d-q9iteP3--YsEAlh8q2Gh9w-IRy5Aa7lkUyCfSCzVnAmestykNYDlBT7Chr3AlWUDuegP15kzFocCbvNSFPzIIC1TRzLT-QZo6H81Di57p_1XIrsrkfqBazTSWIi5oaQPSjPDZ1jF_rf-wBjJzulozA5eax7LO4j5Ix4BFp5puY7XGQNsKLFaLcZnUl3lGuIAsDnSlEc82PalmIYUQdcxTHHtHiokhkwrJiokkSnPp27-JbltEaNqtPAAV7G9EzvbccciJycttGLLN70UgL1OIi6EtwdOZEdhJdUKBXp7ltuoh_YqNB54qGeekywqgRRSeXumaf7NkrfXiieKoiZYa56o1ghM8708xRG-EDlQi2prooZvRezdBaFDJYvvhxD5b8qyk8UW1P441PkwtGOt_YPAd970bwfafYGC5QM03nQMobRCp4qH1NMqgwqdA17cPKRPOemE6hnMYUI9HKIIlgk9oZP4GWEJi79LOX9BKplNZ9SLmEgxypKQaehxhpdxk4KNC6ors1hTr9Z0Cw7qPdEF9Yxa1W5Ybt21XMdsms0jXF1Sz25U69ZR3TTdullrmHXTfq7Qx2Jbq2q7dt1tNi3HdZq2aTsVCiHXUg3Kf3rxa3_-A1L73U0?type=png)](https://mermaid.live/edit#pako:eNqdVO1O2zAUfRXLSBNITckH_UgElfoBGlMLVemkaRQhJ7lpLdw4cxxoQUh7lj3anmQ3SWnXojFEfiS-9j3H9xxf54kGMgTq0UjIh2DGlCbj3iQm-KSZP1UsmZGv59cTSib0ppzPn5ArCDSXMemPNrNtCxO7gmUhkB6kd1omx746bO0PukPSFRxifbBF07YR0B6ekzOWavyW2Z_H4yEZnV6Nd5IdTP6SJUsNilxIDb6Ud2kJ6TAdzEg7ZmKZ8nSDgzgsBzuSupej01eiOnn5x35rHiS3KdbK5_jCkboHVU2Wx4d-q9iteP3--YsEAlh8q2Gh9w-IRy5Aa7lkUyCfSCzVnAmestykNYDlBT7Chr3AlWUDuegP15kzFocCbvNSFPzIIC1TRzLT-QZo6H81Di57p_1XIrsrkfqBazTSWIi5oaQPSjPDZ1jF_rf-wBjJzulozA5eax7LO4j5Ix4BFp5puY7XGQNsKLFaLcZnUl3lGuIAsDnSlEc82PalmIYUQdcxTHHtHiokhkwrJiokkSnPp27-JbltEaNqtPAAV7G9EzvbccciJycttGLLN70UgL1OIi6EtwdOZEdhJdUKBXp7ltuoh_YqNB54qGeekywqgRRSeXumaf7NkrfXiieKoiZYa56o1ghM8708xRG-EDlQi2prooZvRezdBaFDJYvvhxD5b8qyk8UW1P441PkwtGOt_YPAd970bwfafYGC5QM03nQMobRCp4qH1NMqgwqdA17cPKRPOemE6hnMYUI9HKIIlgk9oZP4GWEJi79LOX9BKplNZ9SLmEgxypKQaehxhpdxk4KNC6ors1hTr9Z0Cw7qPdEF9Yxa1W5Ybt21XMdsms0jXF1Sz25U69ZR3TTdullrmHXTfq7Qx2Jbq2q7dt1tNi3HdZq2aTsVCiHXUg3Kf3rxa3_-A1L73U0)
+
 
 ### 🔄 Flux de données
 
@@ -91,14 +63,17 @@ Analyse par chunks → Agrégation → Softmax → Prédiction finale
 ## 📦 Prérequis
 
 ### Système d'exploitation
+
 - **Windows** 10/11 (adapté, mais portable sur Linux/macOS)
 
 ### Logiciels
+
 - **Python** 3.9.25 (recommandé, testé avec cette version)
 - **Conda** ou **Miniconda** (gestion d'environnement)
 - **Claude Desktop** (optionnel, pour l'interface MCP)
 
 ### Hardware recommandé
+
 - **RAM** : 8 GB minimum (16 GB recommandé)
 - **Espace disque** : 2 GB pour le modèle + dépendances
 - **CPU** : Processeur multi-cœurs (le modèle tourne en CPU par défaut)
@@ -148,6 +123,7 @@ pip install requests tqdm nltk
 ### 3️⃣ Télécharger le modèle
 
 Le modèle doit être placé dans :
+
 ```
 C:\Users\...
 ```
@@ -177,6 +153,7 @@ python test_server.py
 ```
 
 Vérifiez le fichier `mcp_server.log` - vous devriez voir :
+
 ```
 === SUCCÈS ===
 ```
@@ -203,6 +180,7 @@ Vérifiez le fichier `mcp_server.log` - vous devriez voir :
 ```
 
 **⚠️ Important** :
+
 - Utilisez des doubles backslashes `\\` dans les chemins Windows
 - Vérifiez que le chemin Python pointe vers l'environnement `nlp`
 - Redémarrez Claude Desktop après modification
@@ -212,12 +190,14 @@ Vérifiez le fichier `mcp_server.log` - vous devriez voir :
 L'API ne nécessite pas de configuration spéciale, mais vous pouvez modifier :
 
 **Port** (dans `mcp_api_server.py`) :
+
 ```python
 # Par défaut : 8000
 # Pour changer : uvicorn mcp_api_server:app --port 8080
 ```
 
 **CORS** (si nécessaire) :
+
 ```python
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -233,6 +213,7 @@ app.add_middleware(
 ### Logging
 
 Les logs sont écrits dans :
+
 ```
 C:\Users\...\mcp_server.log
 Il se trouve dans le meme Workspace que le fichier `mcp_sentiment_server.py`
@@ -298,6 +279,7 @@ uvicorn mcp_api_server:app --reload --host 0.0.0.0 --port 8000
 #### Tester l'API
 
 **Avec curl** :
+
 ```bash
 curl -X POST "http://localhost:8000/analyze" \
   -H "Content-Type: application/json" \
@@ -305,6 +287,7 @@ curl -X POST "http://localhost:8000/analyze" \
 ```
 
 **Avec Python** :
+
 ```python
 import requests
 
@@ -354,15 +337,15 @@ NLP/MCP/
 
 ### Description des fichiers
 
-| Fichier | Description |
-|---------|-------------|
-| `mcp_sentiment_server.py` | Cœur du système : analyse NLP + serveur MCP |
-| `mcp_api_server.py` | API REST avec endpoints `/analyze` et `/analyze_article` |
-| `test_server.py` | Script de diagnostic pour vérifier l'installation |
-| `run_analysis_with_mcp.ipynb` | Analyse batch de fichiers JSON |
-| `test_mcp_api.ipynb` | Tests unitaires de l'API |
-| `environment.yml` | Définition de l'environnement Conda |
-| `mcp_server.log` | Logs d'exécution et debugging |
+| Fichier                       | Description                                              |
+| ----------------------------- | -------------------------------------------------------- |
+| `mcp_sentiment_server.py`     | Cœur du système : analyse NLP + serveur MCP              |
+| `mcp_api_server.py`           | API REST avec endpoints `/analyze` et `/analyze_article` |
+| `test_server.py`              | Script de diagnostic pour vérifier l'installation        |
+| `run_analysis_with_mcp.ipynb` | Analyse batch de fichiers JSON                           |
+| `test_mcp_api.ipynb`          | Tests unitaires de l'API                                 |
+| `environment.yml`             | Définition de l'environnement Conda                      |
+| `mcp_server.log`              | Logs d'exécution et debugging                            |
 
 ---
 
@@ -375,6 +358,7 @@ NLP/MCP/
 **Description** : Analyse le sentiment d'un texte en français.
 
 **Input Schema** :
+
 ```json
 {
   "text": "string (required)"
@@ -382,6 +366,7 @@ NLP/MCP/
 ```
 
 **Output** :
+
 ```json
 {
   "sentiment": "positive" | "neutral" | "negative",
@@ -390,6 +375,7 @@ NLP/MCP/
 ```
 
 **Exemple** :
+
 ```python
 # Depuis Claude Desktop
 "Analyse ce texte : 'Le film était fantastique !'"
@@ -410,6 +396,7 @@ NLP/MCP/
 **Description** : Analyse le sentiment d'un texte unique.
 
 **Request Body** :
+
 ```json
 {
   "text": "string"
@@ -417,6 +404,7 @@ NLP/MCP/
 ```
 
 **Response** :
+
 ```json
 {
   "sentiment": "positive" | "neutral" | "negative",
@@ -425,6 +413,7 @@ NLP/MCP/
 ```
 
 **Exemple curl** :
+
 ```bash
 curl -X POST "http://localhost:8000/analyze" \
   -H "Content-Type: application/json" \
@@ -432,6 +421,7 @@ curl -X POST "http://localhost:8000/analyze" \
 ```
 
 **Réponse** :
+
 ```json
 {
   "sentiment": "negative",
@@ -446,11 +436,13 @@ curl -X POST "http://localhost:8000/analyze" \
 **Description** : Analyse un article et ses commentaires, avec distribution des sentiments.
 
 **Parameters** :
+
 - `article_text` (string, required) : Texte de l'article
 - `article_author` (string, optional) : Auteur de l'article (défaut: "Inconnu")
 - `commentaires` (array, optional) : Liste des commentaires
 
 **Commentaire Schema** :
+
 ```json
 {
   "auteur": "string (optional, défaut: Anonyme)",
@@ -459,6 +451,7 @@ curl -X POST "http://localhost:8000/analyze" \
 ```
 
 **Response** :
+
 ```json
 {
   "post": {
@@ -486,6 +479,7 @@ curl -X POST "http://localhost:8000/analyze" \
 ```
 
 **Exemple Python** :
+
 ```python
 import requests
 
@@ -510,6 +504,7 @@ print(response.json())
 **Description** : Message de bienvenue et informations de l'API.
 
 **Response** :
+
 ```json
 {
   "message": "Bienvenue sur l'API MCP Sentiment. POST /analyze ou /analyze_article"
@@ -578,10 +573,10 @@ results = []
 
 for item in data:
     article = item["article"]
-    
+
     # Analyser l'article
     article_result = analyze_sentiment({"text": article["contenu"]})
-    
+
     # Analyser chaque commentaire
     for comment in item["commentaires"]:
         comment_result = analyze_sentiment({"text": comment["content"]})
@@ -632,18 +627,21 @@ Voici l'analyse des sentiments :
 **Solution** :
 
 1. Vérifiez le fichier de log :
+
    ```
    C:\Users\...\mcp_server.log
-   Dans le meme Workspace 
+   Dans le meme Workspace
    ```
 
 2. Vérifiez que le chemin Python est correct :
+
    ```bash
    where python
    # Utilisez ce chemin dans claude_desktop_config.json
    ```
 
 3. Testez manuellement :
+
    ```bash
    conda activate nlp
    python test_server.py
@@ -658,6 +656,7 @@ Voici l'analyse des sentiments :
 **Erreur** : `ModuleNotFoundError: No module named 'fastapi'`
 
 **Solution** :
+
 ```bash
 conda activate nlp
 pip install fastapi uvicorn
@@ -666,6 +665,7 @@ pip install fastapi uvicorn
 **Erreur** : `Port already in use`
 
 **Solution** :
+
 ```bash
 # Utiliser un autre port
 uvicorn mcp_api_server:app --port 8001
@@ -678,6 +678,7 @@ uvicorn mcp_api_server:app --port 8001
 **Solution** :
 
 1. Vérifiez le chemin :
+
    ```python
    import os
    MODEL_PATH = r"C:\Users\...\models\twitter-xlm-roberta"
@@ -685,12 +686,13 @@ uvicorn mcp_api_server:app --port 8001
    ```
 
 2. Re-téléchargez le modèle :
+
    ```python
    from transformers import AutoTokenizer, AutoModelForSequenceClassification
-   
+
    tokenizer = AutoTokenizer.from_pretrained("cardiffnlp/twitter-xlm-roberta-base-sentiment")
    model = AutoModelForSequenceClassification.from_pretrained("cardiffnlp/twitter-xlm-roberta-base-sentiment")
-   
+
    tokenizer.save_pretrained(MODEL_PATH)
    model.save_pretrained(MODEL_PATH)
    ```
@@ -713,12 +715,14 @@ uvicorn mcp_api_server:app --port 8001
 **Causes possibles** :
 
 1. **Texte mal formaté** : Vérifiez le nettoyage
+
    ```python
    from mcp_sentiment_server import clean_text
    print(clean_text("Votre texte"))
    ```
 
 2. **Langue incorrecte** : Le modèle est optimisé pour le français
+
    ```python
    # Évitez les textes en anglais, espagnol, etc.
    ```
@@ -745,7 +749,7 @@ uvicorn mcp_api_server:app --port 8001
 ```python
 def handle_mcp_request(request: dict) -> dict:
     method = request.get("method")
-    
+
     if method == "tools/list":
         return {
             "tools": [
@@ -764,10 +768,10 @@ def handle_mcp_request(request: dict) -> dict:
                 }
             ]
         }
-    
+
     elif method == "tools/call":
         tool_name = request["params"]["name"]
-        
+
         if tool_name == "translate_and_analyze":
             # Implémenter la traduction + analyse
             pass
@@ -804,7 +808,7 @@ def test_analyze_negative():
 ### Benchmarks
 
 | Taille du texte | Temps d'analyse | Mémoire |
-|-----------------|-----------------|---------|
+| --------------- | --------------- | ------- |
 | < 100 mots      | ~0.5s           | ~500 MB |
 | 100-500 mots    | ~1.5s           | ~600 MB |
 | > 500 mots      | ~3-5s           | ~800 MB |
@@ -812,15 +816,17 @@ def test_analyze_negative():
 ### Optimisations possibles
 
 1. **Cache des résultats** :
+
    ```python
    from functools import lru_cache
-   
+
    @lru_cache(maxsize=1000)
    def analyze_sentiment_cached(text):
        return analyze_sentiment({"text": text})
    ```
 
 2. **Batch processing** :
+
    ```python
    # Analyser plusieurs textes en un seul appel
    def analyze_batch(texts):
