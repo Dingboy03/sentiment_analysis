@@ -125,7 +125,7 @@ pip install requests tqdm nltk
 Le modèle doit être placé dans :
 
 ```
-C:\Users\...
+C:\Users\...\modeles
 ```
 
 **Téléchargement depuis Hugging Face** :
