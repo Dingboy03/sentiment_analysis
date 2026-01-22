@@ -1,6 +1,8 @@
 import sys
 from dotenv import load_dotenv
 import os
+from server.nlp.mcp_sentiment_server import analyze_sentiment
+
 
 # Charger automatiquement le .env
 load_dotenv()

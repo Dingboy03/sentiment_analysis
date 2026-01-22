@@ -9,7 +9,7 @@ load_dotenv()
 
 # Configuration du logging
 LOG_FILE = os.getenv("LOG_FILE")
-MODEL_PATH = os.getenv("MODEL_PATH")
+MODEL_PATH = os.path.abspath(os.getenv("MODEL_PATH"))
 
 
 def log(message):
@@ -94,7 +94,8 @@ def clean_text(text: str) -> str:
 
 def analyze_sentiment(text: str) -> dict:
     """Analyse de sentiment"""
-    log(f"Analyse sentiment pour: {text[:50]}...")
+    log(f"Analyse sentiment pour: {str(text)[:50]}...")
+
     
     # Application des règles de nettoyage
     text = clean_text(text)

@@ -3,7 +3,9 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from mcp_sentiment_server import analyze_sentiment
+
+from server.nlp.mcp_sentiment_server import analyze_sentiment
+
 
 app = FastAPI(title="MCP Sentiment API", version="1.0")
 
@@ -48,16 +50,22 @@ class MCPFullResponse(BaseModel):
 def analyze_text(payload: MCPRequest):
     """Analyse sentiment d'un texte unique"""
     try:
-        result = analyze_sentiment({"text": payload.text})
+        
+        result = analyze_sentiment(payload.text)
+
+        print("RESULT:", result, type(result))
+
         return result
     except Exception as e:
+        print("ERROR:", e)
+
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/analyze_article", response_model=MCPFullResponse)
 def analyze_article(article_text: str, article_author: Optional[str] = "Inconnu", commentaires: Optional[List[CommentairePayload]] = []):
     """Analyse sentiment d'un article + commentaires"""
     # Article
-    post_result = analyze_sentiment({"text": article_text})
+    post_result = analyze_sentiment(article_text)
     post_info = {
         "type": "article",
         "author": article_author,
@@ -69,7 +77,7 @@ def analyze_article(article_text: str, article_author: Optional[str] = "Inconnu"
     # Commentaires
     results = []
     for c in commentaires:
-        res = analyze_sentiment({"text": c.content})
+        res = analyze_sentiment(c.content)
         comment_info = {
             "type": "commentaire",
             "author": c.auteur,

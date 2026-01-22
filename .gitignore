@@ -13,9 +13,6 @@ venv/
 *.conda
 *.virtualenv
 
-# Données lourdes ou sensibles
-*.json
-
 # Environnements IDE
 .vscode/
 *.ipynb_checkpoints
